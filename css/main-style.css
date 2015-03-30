@@ -1,0 +1,112 @@
+.container {
+  width: 960px;
+  margin: auto;
+}
+
+.header {
+  text-align: center;
+}
+
+.hide {
+  display: none !important;
+}
+
+.error {
+  position: absolute;
+  border-radius: 10px;
+  top: 20px;
+  text-align: center;
+  background: red;
+  color: white;
+  width: 400px;
+  margin-left: -200px;
+  left: 50%;
+  z-index: 9999;
+  padding: 10px;
+  border: 1px solid red !important;
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+}
+
+.pregame, .postgame, .gamefull, .readyUp {
+  position: absolute;
+  top: 150px;
+  left: 50%;
+  margin-left: -150px;
+  width: 300px;
+  background: white;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -ms-flex-line-pack: center;
+  -webkit-align-content: center;
+  align-content: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 50px;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+.pregame input, .postgame input, .gamefull input, .readyUp input {
+  padding: 10px;
+  margin: 10px;
+}
+.pregame input[type="button"], .postgame input[type="button"], .gamefull input[type="button"], .readyUp input[type="button"] {
+  border-radius: 5px;
+}
+
+.tic-tac-toe {
+  float: left;
+  height: 500px;
+  width: 500px;
+  box-sizing: border-box;
+}
+.tic-tac-toe div[class^="row-"], .tic-tac-toe div[class*="row-"] {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+.tic-tac-toe div[class^="cell-"], .tic-tac-toe div[class*="cell-"] {
+  border: 5px solid peachpuff;
+  width: 166px;
+  height: 166px;
+  box-sizing: border-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  font-size: 64px;
+}
+
+.chat {
+  display: flex wrap;
+}
+.chat p {
+  padding: 0;
+  margin: 3px;
+}
+.chat .history {
+  padding: 0;
+  margin: 0;
+  height: 488px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border: 5px solid green;
+}
+.chat .controls input {
+  margin: 5px 0;
+  padding: 5px;
+}
+.chat .controls input[type="text"] {
+  width: 947px;
+}
+/*# sourceMappingURL=main-style.css.map */

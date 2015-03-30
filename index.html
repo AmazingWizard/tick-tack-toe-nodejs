@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <title>Tic Tac Toe</title>
+  <head>
+    <link rel="stylesheet" href="/css/main-style.css">
+    <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script src="/js/client.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Tic - Tac - Toe</h1>
+      </div>
+      <div class="error hide"></div>
+      <div class="pregame hide">
+        <h1>Welcome!</h1>
+        <input type="text" placeholder="Please enter a username..." id="username">
+        <input type="button" value="Submit" id="submitUN">
+        <p>Username must contain letters and can contain numbers.</p>
+      </div>
+      <div class="readyUp hide">
+        <h1>Waiting for players...</h1>
+      </div>
+      <div class="postgame hide">
+        <h1>You Won! / You Lost!</h1>
+        <input type="button" value="Play Again?">
+      </div>
+      <div class="gamefull hide">
+        <h1>Game is currently full!</h1>
+      </div>
+      <div class="tic-tac-toe hide">
+        <div class="row-1">
+          <div class="cell-1">0,0</div>
+          <div class="cell-2">1,0</div>
+          <div class="cell-3">2,0</div>
+        </div>
+        <div class="row-2">
+          <div class="cell-1">0,1</div>
+          <div class="cell-2">1,1</div>
+          <div class="cell-3">2,1</div>
+        </div>
+        <div class="row-3">
+          <div class="cell-1">0,2</div>
+          <div class="cell-2">1,2</div>
+          <div class="cell-3">2,2</div>
+        </div>
+        <div class="status"></div>
+      </div>
+      <div class="chat hide">
+        <div class="history">
+          <p><strong>Tom:</strong>good game</p>
+        </div>
+        <div class="controls">
+          <input type="text" placeholder="Send a message...">
+          <input type="button" value="Send" id="chat">
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

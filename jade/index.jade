@@ -1,0 +1,57 @@
+doctype html
+html
+    title Tic Tac Toe
+    head
+        link(rel="stylesheet", href="/css/main-style.css")
+        script(src="//code.jquery.com/jquery-1.11.2.min.js")
+        script(src="//code.jquery.com/jquery-migrate-1.2.1.min.js")
+        script(src="/js/client.js")
+    body
+        .container
+            .header
+                h1 Tic - Tac - Toe
+            .error.hide
+            .pregame.hide
+                h1 Welcome!
+                input(type="text" placeholder="Please enter a username...")#username
+                input(type="button", value="Submit")#submitUN
+                p Username must contain letters and can contain numbers.
+            .readyUp.hide
+                h1 Waiting for players...
+                
+            .postgame.hide
+                h1 You Won! / You Lost!
+                input(type="button", value="Play Again?")
+            .gamefull.hide
+                h1 Game is currently full!
+            .tic-tac-toe.hide
+                .row-1
+                    .cell-1
+                        | 0,0
+                    .cell-2
+                        | 1,0
+                    .cell-3
+                        | 2,0
+                .row-2
+                    .cell-1
+                        | 0,1
+                    .cell-2
+                        | 1,1
+                    .cell-3
+                        | 2,1
+                .row-3
+                    .cell-1
+                        | 0,2
+                    .cell-2
+                        | 1,2
+                    .cell-3
+                        | 2,2
+                .status
+            .chat.hide
+                .history
+                    p
+                        strong Tom:
+                        | good game
+                .controls
+                    input(type="text" placeholder="Send a message...")
+                    input(type="button" value="Send")#chat
