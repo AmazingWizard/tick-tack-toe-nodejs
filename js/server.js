@@ -13,6 +13,21 @@ function htmlEntities(str) {
         .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+function coinFlip() {
+    return Math.floor(Math.random() * 2);
+}
+
+function chatMessage(msg,color,username){
+    data = {
+        'message': htmlEntities(msg),
+        'color': color,
+        'username': username,
+    };
+    for (var i in clients) {
+        sendMessage(clients[i],'chat',data);
+    }
+}
+
 function sendMessage(client, msgType, jsonData) {
     //send Messages to clients.
     //acceptable types are; gameState and chat
@@ -28,7 +43,7 @@ function sendMessage(client, msgType, jsonData) {
 
 // Setup basic websocket server
 var http = require('http');
-var server = http.createServer(function(request, response) {});
+var server = http.createServer( function(request, response) {});
 
 // Set up server listen function on port 8675
 server.listen(8675, function() {
@@ -53,7 +68,7 @@ var clients = {};
 var gameGrid = [
     [0, 1, 2],
     [0, 1, 2],
-    [0, 1, 2],
+    [0, 1, 2]
 ];
 // Game States
 
@@ -68,6 +83,9 @@ var readyUp = {
 };
 var playGame = {
     'gamestate': 'playgame'
+};
+var resetGame = {
+    'gamestate': 'resetgame'
 };
 
 players ={
@@ -92,9 +110,9 @@ wsServer.on('request', function(r) {
         clients[id] = connection;
 
         if (players.player1.connection === undefined) {
-            players.player1.connection = connection;
+            players.player1.connection = clients[id];
         } else if (players.player2.connection === undefined) {
-            players.player2.connection = connection;
+            players.player2.connection = clients[id];
         }
 
         // Change the game state to pregame for the user
@@ -116,20 +134,23 @@ wsServer.on('request', function(r) {
     // Wait for messages to be recieved.
     // ---------------------------------
     connection.on('message', function(message) {
-        console.log(message);
-        if (connection === players.player1.connection) {
-            console.log('this is player one');
-        } else if (connection === players.player2.connection) {
-            console.log('this is player two');
-        }
         try {
             msg = JSON.parse(message.utf8Data);
         } catch (e) {
             console.log('This doesn\'t look like a valid JSON: ', message.utf8Data, e);
             return;
         }
+        if (msg.type === 'coinflip') {
 
+        }
         if(msg.type === 'chat'){
+            if (connection === players.player1.connection) {
+                chatMessage(msg.data.message,'red',players.player1.username);
+            }
+            if (connection === players.player2.connection) {
+                chatMessage(msg.data.message,'blue',players.player2.username);
+            }
+
 
         }
         // When submiting your username, it has a msg type of username.
@@ -146,20 +167,16 @@ wsServer.on('request', function(r) {
                 // asign the username to the correct player.
                 if (players.player1.connection === connection) {
                     console.log('adding player 1');
-                    players.player1 = {
-                        'username': userName,
-                        'ready': 1
-                    };
-                    console.log('Player 1\'s username is: ' + players.player1.username);
+                    players.player1.username = userName;
+                    players.player1.ready = 1;
+                    console.log('Player 1\'s username is: ' + players.player1.username + 'Status is: ' + players.player1.ready);
                     sendMessage(connection, 'gamestate', readyUp);
                 }
                 if (players.player2.connection === connection) {
                     console.log('adding player 2');
-                    players.player2 = {
-                        'username': userName,
-                        'ready': 1
-                    };
-                    console.log('Player 1\'s username is: ' + players.player2.username);
+                    players.player2.username = userName;
+                    players.player2.ready = 1;
+                    console.log('Player 2\'s username is: ' + players.player2.username + 'Status is: ' + players.player2.ready);
                     sendMessage(connection, 'gamestate', readyUp);
                 }
 
@@ -173,11 +190,19 @@ wsServer.on('request', function(r) {
 
         if (msg.type === 'readyStatus') {
 
-            if (players.player1.ready && players.player2.ready === 1) {
-                sendMessage(connection,'waiting',false);
-                sendMessage(connection,'gamestate',playGame);
-            } else {
-                sendMessage(connection,'waiting',true);
+            if (players.player1.ready && players.player2.ready == 1) {
+                console.log('play game!');
+                sendMessage(players.player1.connection,'gamestate',playGame);
+                sendMessage(players.player2.connection,'gamestate',playGame);
+                var coin = coinFlip();
+                if (coin === 1) {
+                    var p1 = players.player1.username + ' has one the coin flip and will go first!';
+                    chatMessage(p1,'green','SYSTEM');
+                } else {
+                    var p2 = players.player2.username + ' has one the coin flip and will go first!';
+                    chatMessage(p2,'green','SYSTEM');
+                }
+
             }
         }
     });
@@ -187,18 +212,21 @@ wsServer.on('request', function(r) {
     // Handle Dissconnections
     // ---------------------------------
     connection.on('close', function(reasonCode, description) {
+        if (connection === players.player1.connection) {
+            console.log('Player1 Leaving');
+            delete players.player1.connection;
+            players.player1.ready = 0;
+        }
+        if (connection === players.player2.connection) {
+            console.log('Player2 Leaving');
+            delete players.player2.connection;
+            players.player2.ready = 0;
+        }
         if (reasonCode == 1000) {
             delete clients[id];
             console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
             console.log((new Date()) + ' Reason: ' + reasonCode + ' \"' + description + '\"');
         } else {
-            if (players.player1.connection === connection) {
-                player.player1 = {};
-                console.log('Player 1 leaving');
-            } else if (players.player2.connection === connection) {
-                player.player2 = {};
-                console.log('Player 2 leaving');
-            }
             delete clients[id];
             console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
             console.log((new Date()) + ' Reason: ' + reasonCode + ' \"' + description + '\"');

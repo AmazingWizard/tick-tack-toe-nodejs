@@ -1,6 +1,11 @@
 $(document).ready(function(){
 
     var ws = new WebSocket('ws://localhost:8675', 'echo-protocol');
+
+    function updateScroll(){
+        var element = document.getElementById("chatlog");
+        element.scrollTop = element.scrollHeight;
+    }
     function sendMessage(type, data){
         var msg = JSON.stringify({
             'type': type,
@@ -8,16 +13,37 @@ $(document).ready(function(){
             });
         ws.send(msg);
     }
+
+    function sendChatMessage(){
+        var msg = {
+            'message': $('#chatbox').val()
+        };
+        if ( $('#chatbox').val() !== '' ) {
+            sendMessage('chat', msg);
+            $('#chatbox').val('');
+        }
+    }
+
+    $(document).keypress(function(e){
+        if(e.which == 13 && !$('.chat').hasClass('hide') ){
+            sendChatMessage();
+        }
+    });
     $('#submitUN').click(function(){
         var username = {
             'un': $('#username').val()
         };
         sendMessage('username', username);
     });
+
+    $('#chat').click(function(){
+        sendChatMessage();
+    });
     // ----------------------- ----------
     // Event listener for server messages.
     // ---------------------------------
     ws.addEventListener('message', function(message){
+        console.log(message);
         try {
              msg = JSON.parse(message.data);
          } catch (e) {
@@ -27,6 +53,10 @@ $(document).ready(function(){
 
         if (msg.type === 'error') {
             error(msg.data.error);
+        }
+        if (msg.type === 'chat'){
+            $('.history').append('<p><strong style=\"color: ' + msg.data.color + ';\">' + msg.data.username + ': </strong>' + msg.data.message);
+            updateScroll();
         }
         if (msg.type === 'gamestate') {
             if (msg.data.gamestate === 'fullgame') {
@@ -54,22 +84,12 @@ $(document).ready(function(){
                 sendMessage('readyStatus','');
             }
             if (msg.data.gamestate === 'playgame') {
+                console.log('Gamestate: '+ msg.data.gamestate);
                 $('.readyUp').addClass('hide');
                 $('.tic-tac-toe').removeClass('hide');
                 $('.chat').removeClass('hide');
+                sendMessage('coinflip','');
 
-            }
-        }
-        if (msg.type === 'waiting') {
-            console.log('waiting...');
-            if (msg.data === true) {
-                var time = 30000000;
-                while (time > 0) {
-                    time = time - 1;
-                }
-                if (time === 0) {
-                    sendMessage('readyStatus','');
-                }
             }
         }
 
