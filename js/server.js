@@ -17,14 +17,18 @@ function coinFlip() {
     return Math.floor(Math.random() * 2);
 }
 
-function chatMessage(msg,color,username){
+function chatMessage(msg,color,username,user){
     data = {
         'message': htmlEntities(msg),
         'color': color,
         'username': username,
     };
-    for (var i in clients) {
-        sendMessage(clients[i],'chat',data);
+    if (user === 'all') {
+        for (var i in clients) {
+            sendMessage(clients[i],'chat',data);
+        }
+    } else {
+        sendMessage(user,'chat',data)
     }
 }
 
@@ -145,10 +149,10 @@ wsServer.on('request', function(r) {
         }
         if(msg.type === 'chat'){
             if (connection === players.player1.connection) {
-                chatMessage(msg.data.message,'red',players.player1.username);
+                chatMessage(msg.data.message,'red',players.player1.username,'all');
             }
             if (connection === players.player2.connection) {
-                chatMessage(msg.data.message,'blue',players.player2.username);
+                chatMessage(msg.data.message,'blue',players.player2.username,'all');
             }
 
 
@@ -197,10 +201,13 @@ wsServer.on('request', function(r) {
                 var coin = coinFlip();
                 if (coin === 1) {
                     var p1 = players.player1.username + ' has one the coin flip and will go first!';
-                    chatMessage(p1,'green','SYSTEM');
+                    chatMessage(p1,'gray','SYSTEM','all');
+                    players.player1.turn = true;
+                    sendMessage(players.player1.connection,'turn',true);
                 } else {
                     var p2 = players.player2.username + ' has one the coin flip and will go first!';
-                    chatMessage(p2,'green','SYSTEM');
+                    chatMessage(p2,'gray','SYSTEM','all');
+                    sendMessage(players.player2.connection);
                 }
 
             }

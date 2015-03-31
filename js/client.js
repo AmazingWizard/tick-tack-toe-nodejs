@@ -55,8 +55,13 @@ $(document).ready(function(){
             error(msg.data.error);
         }
         if (msg.type === 'chat'){
-            $('.history').append('<p><strong style=\"color: ' + msg.data.color + ';\">' + msg.data.username + ': </strong>' + msg.data.message);
-            updateScroll();
+            if (msg.data.username === 'SYSTEM') {
+                $('.history').append('<p style=\"color: ' + msg.data.color + '; font-style:italic;\"><strong>' + msg.data.username + ': </strong>' + msg.data.message);
+                updateScroll();
+            } else {
+                $('.history').append('<p><strong style=\"color: ' + msg.data.color + ';\">' + msg.data.username + ': </strong>' + msg.data.message);
+                updateScroll();
+            }
         }
         if (msg.type === 'gamestate') {
             if (msg.data.gamestate === 'fullgame') {
