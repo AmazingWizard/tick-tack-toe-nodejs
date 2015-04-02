@@ -2,10 +2,13 @@ $(document).ready(function(){
 
     var ws = new WebSocket('ws://localhost:8675', 'echo-protocol');
 
+    var myTurn = false;
+
     function updateScroll(){
         var element = document.getElementById("chatlog");
         element.scrollTop = element.scrollHeight;
     }
+
     function sendMessage(type, data){
         var msg = JSON.stringify({
             'type': type,
@@ -24,11 +27,25 @@ $(document).ready(function(){
         }
     }
 
+    //action that sends turn choice
+
+        $('[class*=col-]').click(function(){
+            if (myTurn === true) {
+                var myChoice = $(this).attr('class');
+                sendMessage('gridchoice',myChoice);
+                // sendMessage('gridChoice',$(this).attr('class'));
+            }
+        });
+
+
+    // Send chat message on enter key press
     $(document).keypress(function(e){
         if(e.which == 13 && !$('.chat').hasClass('hide') ){
             sendChatMessage();
         }
     });
+
+    // Submit username to server
     $('#submitUN').click(function(){
         var username = {
             'un': $('#username').val()
@@ -36,6 +53,7 @@ $(document).ready(function(){
         sendMessage('username', username);
     });
 
+    // send chat message when send button clicked
     $('#chat').click(function(){
         sendChatMessage();
     });
@@ -95,6 +113,11 @@ $(document).ready(function(){
                 $('.chat').removeClass('hide');
                 sendMessage('coinflip','');
 
+            }
+            if (msg.data.gamestate === 'turn') {
+                myTurn = true;
+                console.log(myTurn)
+                console.log('Its My Turn');
             }
         }
 

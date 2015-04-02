@@ -17,6 +17,10 @@ function coinFlip() {
     return Math.floor(Math.random() * 2);
 }
 
+function winCondition(){
+
+}
+
 function chatMessage(msg,color,username,user){
     data = {
         'message': htmlEntities(msg),
@@ -28,7 +32,7 @@ function chatMessage(msg,color,username,user){
             sendMessage(clients[i],'chat',data);
         }
     } else {
-        sendMessage(user,'chat',data)
+        sendMessage(user,'chat',data);
     }
 }
 
@@ -65,14 +69,15 @@ wsServer = new WebSocketServer({
 // These variables store the clients.
 var count = 0;
 var clients = {};
+var turns = 0;
 
 
 // Create the Game Grid that Tic Tac Toe is played on.
 
 var gameGrid = [
-    [0, 1, 2],
-    [0, 1, 2],
-    [0, 1, 2]
+    ['', '', ''],
+    ['', '', ''],
+    ['', '', '']
 ];
 // Game States
 
@@ -91,7 +96,9 @@ var playGame = {
 var resetGame = {
     'gamestate': 'resetgame'
 };
-
+var turn = {
+    'gamestate': 'turn'
+};
 players ={
     'player1':{},
     'player2':{}
@@ -144,7 +151,21 @@ wsServer.on('request', function(r) {
             console.log('This doesn\'t look like a valid JSON: ', message.utf8Data, e);
             return;
         }
-        if (msg.type === 'coinflip') {
+        if (msg.type === 'gridchoice') {
+            var selection = [];
+            selection[0] = msg.data.slice(4,-2);
+            selection[1] = msg.data.slice(6);
+
+            if (grid[selection[0]][selection[1]] === '') {
+                if (connection === players.player1.connection) {
+                    grid[selection[0]][selection[1]] = players.player1.username;
+                    sendMessage(players.player1.connection,'gamtestate',turn);
+
+                }
+                if (connection === players.player2.connection) {
+                    grid[selection[0]][selection[1]] = players.player2.username;
+                }
+            }
 
         }
         if(msg.type === 'chat'){
@@ -193,7 +214,6 @@ wsServer.on('request', function(r) {
         }
 
         if (msg.type === 'readyStatus') {
-
             if (players.player1.ready && players.player2.ready == 1) {
                 console.log('play game!');
                 sendMessage(players.player1.connection,'gamestate',playGame);
@@ -202,12 +222,11 @@ wsServer.on('request', function(r) {
                 if (coin === 1) {
                     var p1 = players.player1.username + ' has one the coin flip and will go first!';
                     chatMessage(p1,'gray','SYSTEM','all');
-                    players.player1.turn = true;
-                    sendMessage(players.player1.connection,'turn',true);
+                    sendMessage(players.player1.connection,'gamtestate',turn);
                 } else {
                     var p2 = players.player2.username + ' has one the coin flip and will go first!';
                     chatMessage(p2,'gray','SYSTEM','all');
-                    sendMessage(players.player2.connection);
+                    sendMessage(players.player2.connection,'gamestate',turn);
                 }
 
             }

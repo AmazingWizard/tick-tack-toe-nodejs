@@ -59,7 +59,7 @@ text-align: center;
     div[class^="row-"], div[class*="row-"]{
         display: flex;
     }
-    div[class^="cell-"], div[class*="cell-"]{
+    div[class^="col-"], div[class*="cell-"]{
         border: 5px solid peachpuff;
         width: 166px;
         height:  166px;
