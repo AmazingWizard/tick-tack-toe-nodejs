@@ -61,7 +61,7 @@ $(document).ready(function(){
     // Event listener for server messages.
     // ---------------------------------
     ws.addEventListener('message', function(message){
-        console.log(message);
+        console.log(message.data);
         try {
              msg = JSON.parse(message.data);
          } catch (e) {
@@ -114,10 +114,24 @@ $(document).ready(function(){
                 sendMessage('coinflip','');
 
             }
-            if (msg.data.gamestate === 'turn') {
-                myTurn = true;
-                console.log(myTurn)
+        }
+        if (msg.type === 'grid'){
+            var grid = msg.data;
+            grid.forEach(function(row, rowIndex){
+                row.forEach(function(col,colIndex){
+                    $('.col-' + rowIndex + '-' + colIndex).html(col);
+                });
+            });
+        }
+        if (msg.type === 'turn') {
+            console.log(myTurn);
+            console.log(msg.data);
+            myTurn = msg.data;
+            console.log(myTurn);
+            if (myTurn) {
                 console.log('Its My Turn');
+            } else {
+                console.log('Its not my turn.');
             }
         }
 
@@ -130,8 +144,6 @@ $(document).ready(function(){
 });
 
 function error(msg){
-    // var username = $('#username').val();
-    // var validName = new RegExp ('[a-zA-Z][a-zA-Z0-9.\-_]{2,31}');
         $('.error').removeClass('hide');
         $('.error').html('<p><strong>Error: </strong>' + msg + '</p>');
 }
