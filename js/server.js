@@ -6,61 +6,61 @@
 // Server Functions
 //----------------------------------------------
 
-function serverLog(msg){
-    console.log((new Date()) + ' ' + msg );
+function serverLog(msg) {
+    console.log((new Date()) + ' ' + msg);
 }
 
 // Our Wind Condition solver. This function iterates over all the player choices made, and compaires them to a list of known.
 // solutions listed below. If it finds a match it reutrns True, if it doesn't it returns False.
 
-function winCondition(list,picked){
+function winCondition(list, picked) {
     var isGameOver = false;
     serverLog('Calculating Game Victory...');
-	solutions.forEach(function(list,listIndex){
-		if(isGameOver === false){
-			list.forEach(function(solution,solutionIndex){
-				var matches = 0;
-				if(matches < 3){
-					solution.forEach(function(pair,pairIndex){
-						picked.forEach(function(choice,choiceIndex){
-							if(choice[0] == pair [0] && choice[1] == pair[1]){
-								matches++;
-								if(matches >= 3){
-									isGameOver = true;
-								}
-							}
-						});
-					});
-				}
-			});
-		}
-	});
-	if(isGameOver){
-		return true;
-	} else {
-		return false;
-	}
+    solutions.forEach(function(list, listIndex) {
+        if (isGameOver === false) {
+            list.forEach(function(solution, solutionIndex) {
+                var matches = 0;
+                if (matches < 3) {
+                    solution.forEach(function(pair, pairIndex) {
+                        picked.forEach(function(choice, choiceIndex) {
+                            if (choice[0] == pair[0] && choice[1] == pair[1]) {
+                                matches++;
+                                if (matches >= 3) {
+                                    isGameOver = true;
+                                }
+                            }
+                        });
+                    });
+                }
+            });
+        }
+    });
+    if (isGameOver) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 // Our Draw Game funtion. This function first checks to make sure the game is not over by running a WinCondition() on each character and storing the results.
 // It then iterates over the Grid to see how many plays have been made. Since a draw can only happen if neither the WinCon is met and the board is full
 // it will return True if all those are true. If not it reutrns False.
 
-function isDraw(grid){
+function isDraw(grid) {
     serverLog('Calculating Draw...');
-    var p1GameOverCheck = winCondition(solutions,players.player1.picked);
-    var p2GameOverCheck = winCondition(solutions,players.player2.picked);
+    var p1GameOverCheck = winCondition(solutions, players.player1.picked);
+    var p2GameOverCheck = winCondition(solutions, players.player2.picked);
     var choices = 0;
-    grid.forEach(function(row,rowIndex){
-        row.forEach(function(col,colIndex){
+    grid.forEach(function(row, rowIndex) {
+        row.forEach(function(col, colIndex) {
             serverLog('checking [' + rowIndex + ',' + colIndex + ']: ' + col);
-            if(col !== ''){
+            if (col !== '') {
                 choices++;
             }
         });
     });
 
-    if(choices >= 9 && p1GameOverCheck === false && p2GameOverCheck === false){
+    if (choices >= 9 && p1GameOverCheck === false && p2GameOverCheck === false) {
         return true;
     } else {
         return false;
@@ -72,7 +72,7 @@ function isDraw(grid){
 // Initially I had this written out twice... for each player. Once it got to big I made it genaric and converted it to a funtion.
 // This triggers when a choice is sent to the server.
 
-function turn(connection,selection){
+function turn(connection, selection) {
     //whos turn is it
     var currTurn = '';
     var nextTurn = '';
@@ -90,46 +90,46 @@ function turn(connection,selection){
     }
 
     // make sure that the grid selection isn't already taken.
-    if(grid[selection[0]][selection[1]] === ''){
+    if (grid[selection[0]][selection[1]] === '') {
         // push the selection to the current players list of selections.
         currTurn.picked.push(selection);
         // place the player symble (X or O) in the grid.
         grid[selection[0]][selection[1]] = currTurn.symble;
         // Check to see if the game has ended as a result of this new selection.
         serverLog('Check for Game Over');
-        var gameOverCheck = winCondition(solutions,currTurn.picked);
-        if(gameOverCheck){
+        var gameOverCheck = winCondition(solutions, currTurn.picked);
+        if (gameOverCheck) {
             //If the game is over send a message to both players.
-            sendMessage(currTurn.connection,'grid',grid);
-            sendMessage(nextTurn.connection,'grid',grid);
+            sendMessage(currTurn.connection, 'grid', grid);
+            sendMessage(nextTurn.connection, 'grid', grid);
             serverLog(currTurn.username + ' Wins the game!');
             gameOver.winner = currTurn.username;
             gameOver.loser = nextTurn.username;
-            sendMessage(currTurn.connection,'gamestate',gameOver);
-            sendMessage(nextTurn.connection,'gamestate',gameOver);
+            sendMessage(currTurn.connection, 'gamestate', gameOver);
+            sendMessage(nextTurn.connection, 'gamestate', gameOver);
             clearGameBoard();
         }
         //Check to see if the game is a draw.
         serverLog('Check for Draw');
         var draw = isDraw(grid);
-         if(draw === false){
-             // if the game does not end in a draw, send turn information to the players
-             // and continue playing.
+        if (draw === false) {
+            // if the game does not end in a draw, send turn information to the players
+            // and continue playing.
             var chatMSG = 'it is ' + nextTurn.username + '\'s turn!';
 
-            sendMessage(nextTurn.connection,'turn',true);
-            sendMessage(currTurn.connection,'turn',false);
+            sendMessage(nextTurn.connection, 'turn', true);
+            sendMessage(currTurn.connection, 'turn', false);
             gameOver.winner = 'draw';
-            sendMessage(currTurn.connection,'grid',grid);
-            sendMessage(nextTurn.connection,'grid',grid);
+            sendMessage(currTurn.connection, 'grid', grid);
+            sendMessage(nextTurn.connection, 'grid', grid);
 
-            chatMessage(chatMSG,'gray','SYSTEM','all');
+            chatMessage(chatMSG, 'gray', 'SYSTEM', 'all');
         } else {
             // if not then send a Draw message.
-            sendMessage(currTurn.connection,'grid',grid);
-            sendMessage(nextTurn.connection,'grid',grid);
-            sendMessage(currTurn.connection,'gamestate',gameOver);
-            sendMessage(nextTurn.connection,'gamestate',gameOver);
+            sendMessage(currTurn.connection, 'grid', grid);
+            sendMessage(nextTurn.connection, 'grid', grid);
+            sendMessage(currTurn.connection, 'gamestate', gameOver);
+            sendMessage(nextTurn.connection, 'gamestate', gameOver);
             clearGameBoard();
         }
     }
@@ -141,12 +141,12 @@ function clearGameBoard() {
         ['', '', ''],
         ['', '', '']
     ];
-    players ={
-        'player1':{
-            'picked':[]
+    players = {
+        'player1': {
+            'picked': []
         },
-        'player2':{
-            'picked':[]
+        'player2': {
+            'picked': []
         }
     };
     gameOver = {
@@ -167,7 +167,7 @@ function coinFlip() {
 }
 
 // Chat handler function for chat messages.
-function chatMessage(msg,color,username,user){
+function chatMessage(msg, color, username, user) {
     data = {
         'message': htmlEntities(msg),
         'color': color,
@@ -175,10 +175,10 @@ function chatMessage(msg,color,username,user){
     };
     if (user === 'all') {
         for (var i in clients) {
-            sendMessage(clients[i],'chat',data);
+            sendMessage(clients[i], 'chat', data);
         }
     } else {
-        sendMessage(user,'chat',data);
+        sendMessage(user, 'chat', data);
     }
 }
 
@@ -199,7 +199,7 @@ function sendMessage(client, msgType, jsonData) {
 
 // Setup basic websocket server
 var http = require('http');
-var server = http.createServer( function(request, response) {});
+var server = http.createServer(function(request, response) {});
 
 // Set up server listen function on port 8675
 // make it look cool! Why not... I gotta stare at this thing a whole lot...
@@ -234,20 +234,52 @@ var grid = [
 
 // Win Conditions!
 var vert = [
-		[[0,0],[0,1],[0,2]],
-		[[1,0],[1,1],[2,1]],
-		[[2,0],[2,1],[2,2]]
-	];
+    [
+        [0, 0],
+        [0, 1],
+        [0, 2]
+    ],
+    [
+        [1, 0],
+        [1, 1],
+        [2, 1]
+    ],
+    [
+        [2, 0],
+        [2, 1],
+        [2, 2]
+    ]
+];
 var hor = [
-		[[0,0],[1,0],[2,0]],
-		[[0,1],[1,1],[2,1]],
-		[[0,2],[1,2],[2,2]]
-	];
+    [
+        [0, 0],
+        [1, 0],
+        [2, 0]
+    ],
+    [
+        [0, 1],
+        [1, 1],
+        [2, 1]
+    ],
+    [
+        [0, 2],
+        [1, 2],
+        [2, 2]
+    ]
+];
 var diag = [
-		[[0,0],[1,1],[2,2]],
-		[[2,0],[1,1],[0,2]]
-	];
-var solutions = [vert,hor,diag];
+    [
+        [0, 0],
+        [1, 1],
+        [2, 2]
+    ],
+    [
+        [2, 0],
+        [1, 1],
+        [0, 2]
+    ]
+];
+var solutions = [vert, hor, diag];
 
 
 // Game States
@@ -273,12 +305,12 @@ var gameOver = {
 };
 
 // our lovely players!
-var players ={
-    'player1':{
-        'picked':[]
+var players = {
+    'player1': {
+        'picked': []
     },
-    'player2':{
-        'picked':[]
+    'player2': {
+        'picked': []
     }
 };
 
@@ -334,17 +366,17 @@ wsServer.on('request', function(r) {
         //Handle grid selections.
         if (msg.type === 'gridchoice') {
             var selection = [];
-            selection[0] = msg.data.slice(4,-2);
+            selection[0] = msg.data.slice(4, -2);
             selection[1] = msg.data.slice(6);
-            turn(connection,selection);
+            turn(connection, selection);
         }
         //Handle chat messages.
-        if(msg.type === 'chat'){
+        if (msg.type === 'chat') {
             if (connection === players.player1.connection) {
-                chatMessage(msg.data.message,'red',players.player1.username,'all');
+                chatMessage(msg.data.message, 'red', players.player1.username, 'all');
             }
             if (connection === players.player2.connection) {
-                chatMessage(msg.data.message,'blue',players.player2.username,'all');
+                chatMessage(msg.data.message, 'blue', players.player2.username, 'all');
             }
 
 
@@ -382,18 +414,18 @@ wsServer.on('request', function(r) {
 
         if (msg.type === 'readyStatus') {
             if (players.player1.ready && players.player2.ready == 1) {
-                sendMessage(players.player1.connection,'gamestate',playGame);
-                sendMessage(players.player2.connection,'gamestate',playGame);
+                sendMessage(players.player1.connection, 'gamestate', playGame);
+                sendMessage(players.player2.connection, 'gamestate', playGame);
                 var coin = coinFlip();
                 if (coin === 1) {
                     var p1 = players.player1.username + ' has one the coin flip and will go first!';
-                    chatMessage(p1,'gray','SYSTEM','all');
+                    chatMessage(p1, 'gray', 'SYSTEM', 'all');
 
-                    sendMessage(players.player1.connection,'turn',true);
+                    sendMessage(players.player1.connection, 'turn', true);
                 } else {
                     var p2 = players.player2.username + ' has one the coin flip and will go first!';
-                    chatMessage(p2,'gray','SYSTEM','all');
-                    sendMessage(players.player2.connection,'turn',true);
+                    chatMessage(p2, 'gray', 'SYSTEM', 'all');
+                    sendMessage(players.player2.connection, 'turn', true);
                 }
 
             }
