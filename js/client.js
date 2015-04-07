@@ -8,6 +8,9 @@ $(document).ready(function(){
         var element = document.getElementById("chatlog");
         element.scrollTop = element.scrollHeight;
     }
+    function reloadGame(){
+        location.reload();
+    }
 
     function sendMessage(type, data){
         var msg = JSON.stringify({
@@ -112,6 +115,12 @@ $(document).ready(function(){
                 $('.tic-tac-toe').removeClass('hide');
                 $('.chat').removeClass('hide');
                 sendMessage('coinflip','');
+            }
+            if (msg.data.gamestate === 'postgame') {
+                $('.tic-tac-toe').addClass('hide');
+                $('.chat').addClass('hide');
+                $('.postgame').removeClass('hide');
+                $('.postgame').prepend('<h1>' + msg.data.winner + ' has won the game!');
 
             }
         }

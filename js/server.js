@@ -103,7 +103,11 @@ function turn(connection,selection){
             sendMessage(currTurn.connection,'grid',grid);
             sendMessage(nextTurn.connection,'grid',grid);
             serverLog(currTurn.username + ' Wins the game!');
+            gameOver.winner = currTurn.username;
+            gameOver.loser = nextTurn.username;
             sendMessage(currTurn.connection,'gamestate',gameOver);
+            sendMessage(nextTurn.connection,'gamestate',gameOver);
+            clearGameBoard();
         }
         //Check to see if the game is a draw.
         serverLog('Check for Draw');
@@ -128,7 +132,27 @@ function turn(connection,selection){
         }
     }
 }
-
+// Reset the game after it is won.
+function clearGameBoard() {
+    grid = [
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', '']
+    ];
+    players ={
+        'player1':{
+            'picked':[]
+        },
+        'player2':{
+            'picked':[]
+        }
+    };
+    gameOver = {
+        'gamestate': 'postgame',
+        'winner': '',
+        'loser': ''
+    };
+}
 // Funtion to strip out HTML characters
 function htmlEntities(str) {
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -241,20 +265,20 @@ var resetGame = {
     'gamestate': 'resetgame'
 };
 var gameOver = {
-    'gamestate': 'postGame',
+    'gamestate': 'postgame',
     'winner': '',
     'loser': ''
 };
 
 // our lovely players!
-players ={
+var players ={
     'player1':{
         'picked':[]
     },
     'player2':{
         'picked':[]
     }
-},
+};
 
 // Our main listen funtion. This will help drive the Chat and our game logic.
 wsServer.on('request', function(r) {
