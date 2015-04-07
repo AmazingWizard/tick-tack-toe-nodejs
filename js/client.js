@@ -120,7 +120,11 @@ $(document).ready(function(){
                 $('.tic-tac-toe').addClass('hide');
                 $('.chat').addClass('hide');
                 $('.postgame').removeClass('hide');
-                $('.postgame').prepend('<h1>' + msg.data.winner + ' has won the game!');
+                if (msg.data.winner === 'draw') {
+                    $('.postgame').prepend('<h1> I\'s a Draw!');
+                } else {
+                    $('.postgame').prepend('<h1>' + msg.data.winner + ' has won the game!');
+                }
 
             }
         }

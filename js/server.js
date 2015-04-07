@@ -119,7 +119,7 @@ function turn(connection,selection){
 
             sendMessage(nextTurn.connection,'turn',true);
             sendMessage(currTurn.connection,'turn',false);
-
+            gameOver.winner = 'draw';
             sendMessage(currTurn.connection,'grid',grid);
             sendMessage(nextTurn.connection,'grid',grid);
 
@@ -128,7 +128,9 @@ function turn(connection,selection){
             // if not then send a Draw message.
             sendMessage(currTurn.connection,'grid',grid);
             sendMessage(nextTurn.connection,'grid',grid);
-            serverLog('its a Draw!!');
+            sendMessage(currTurn.connection,'gamestate',gameOver);
+            sendMessage(nextTurn.connection,'gamestate',gameOver);
+            clearGameBoard();
         }
     }
 }
